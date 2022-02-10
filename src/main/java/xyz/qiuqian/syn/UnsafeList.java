@@ -10,9 +10,11 @@ import java.util.List;
 public class UnsafeList {
     public static void main(String[] args) {
         List<String> list = new ArrayList<String>();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000; i++) {
             new Thread(() -> {
-                list.add(Thread.currentThread().getName());
+                synchronized (list) {
+                    list.add(Thread.currentThread().getName());
+                }
             }).start();
         }
         try {

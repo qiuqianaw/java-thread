@@ -7,7 +7,7 @@ package xyz.qiuqian.syn;
  */
 public class UnsafeBank {
     public static void main(String[] args) {
-        Account account = new Account(100, "qiuqian's Funding");
+        Account account = new Account(10000, "qiuqian's Funding");
         Drawing you = new Drawing(account, 50, "你");
         Drawing friend = new Drawing(account, 100, "friend");
 
@@ -39,22 +39,25 @@ class Drawing extends Thread {
 
     @Override
     public void run() {
-        if ( account.money - drawing_money < 0 ) {
-            System.out.println(Thread.currentThread().getName() + "钱不够，取不了");
-            return;
+        // synchronized 块
+        synchronized (account) {
+            if ( account.money - drawing_money < 0 ) {
+                System.out.println(Thread.currentThread().getName() + "钱不够，取不了");
+                return;
+            }
+            // 模拟延时，放大问题发生
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            account.money -= drawing_money;
+            deposit += drawing_money;
+
+            System.out.println(account.name + "余额为：" + account.money);
+            System.out.println(Thread.currentThread().getName() + "手里的钱：" + deposit);
         }
-        // 模拟延时，放大问题发生
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        account.money -= drawing_money;
-        deposit += drawing_money;
-
-        System.out.println(account.name + "余额为：" + account.money);
-
-        System.out.println(Thread.currentThread().getName() + "手里的钱：" + deposit);
     }
 }
